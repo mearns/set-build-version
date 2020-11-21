@@ -1,0 +1,17 @@
+name: Set Build Version
+author: Brian Mearns
+
+description: Update the build-time version in package.json to give this build a unique version string.
+
+branding:
+  icon: bookmark
+  color: yellow
+
+outputs:
+  version:
+    description: Your new version string.
+    value: ${{ steps.version.outputs.version }}
+
+runs:
+  using: node12
+  main: src/main.js

@@ -1,0 +1,69 @@
+{
+  "name": "set-build-version",
+  "private": true,
+  "version": "1.0.0",
+  "description": "A github action to update the build-time version in package.json to give this build a unique version string.",
+  "keywords": [
+    "github",
+    "action",
+    "version",
+    "semver",
+    "github-action",
+    "github-actions"
+  ],
+  "author": "Brian Mearns <mearns.b@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mearns/set-build-version.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mearns/set-build-version/issues"
+  },
+  "homepage": "https://github.com/mearns/set-build-version#readme",
+  "engines": {
+    "node": "^12.14.0"
+  },
+  "main": "src/index.js",
+  "files": [
+    "src/**/*"
+  ],
+  "scripts": {
+    "clean": "rimraf reports/ public/",
+    "pretty": "pretty-quick --staged",
+    "pretty-all": "prettier --write src/**/*.js ./*.js ./*.json ./*.yaml ./*.yml",
+    "check": "eslint --max-warnings 0 --no-error-on-unmatched-pattern --format codeframe src/ test/ dev-scripts/ \"./*.js\"",
+    "test": "jest --coverage",
+    "test-only": "jest",
+    "build": "echo \"No build required for this project.\"",
+    "verify": "npm run check && npm run test",
+    "report": "mkdirp public && copyfiles logo.png public/ && copyfiles \"reports/**/*\" public && mustache package.json dev-scripts/resources/pages/index.hbs > public/index.html",
+    "start": "node ."
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run pretty -s"
+    }
+  },
+  "logo": "logo.png",
+  "devDependencies": {
+    "@actions/core": "^1.2.6",
+    "copyfiles": "^2.4.0",
+    "eslint": "^7.13.0",
+    "eslint-config-mearns": "git+https://github.com/mearns/eslint-config-mearns.git#v0.3.0",
+    "husky": "^4.3.0",
+    "jest": "^26.6.3",
+    "jest-junit": "^12.0.0",
+    "jest-stare": "^2.2.0",
+    "mkdirp": "^1.0.4",
+    "mustache": "^4.0.1",
+    "node": "^13.14.0",
+    "nyc": "^15.1.0",
+    "prettier": "^1.19.1",
+    "pretty-quick": "^2.0.2"
+  },
+  "dependencies": {
+    "@actions/exec": "^1.0.4",
+    "update-json-file": "^1.1.1"
+  }
+}
