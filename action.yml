@@ -15,4 +15,4 @@ outputs:
 
 runs:
   using: node12
-  main: src/main.js
+  main: src/action/main.js
