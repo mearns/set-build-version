@@ -10,7 +10,8 @@ branding:
 outputs:
   version:
     description: Your new version string.
-    value: ${{ steps.version.outputs.version }}
+  buildInfo:
+    description: Additional buildInfo added to package.json, as a JSON string.
 
 runs:
   using: node12

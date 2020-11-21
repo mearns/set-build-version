@@ -24,11 +24,15 @@
   "engines": {
     "node": "^12.14.0"
   },
+  "bin": {
+    "set-build-version": "src/main.js"
+  },
   "main": "src/index.js",
   "files": [
     "src/**/*"
   ],
   "scripts": {
+    "pre-commit": "npm start -- pre-commit",
     "clean": "rimraf reports/ public/",
     "pretty": "pretty-quick --staged",
     "pretty-all": "prettier --write src/**/*.js ./*.js ./*.json ./*.yaml ./*.yml",
@@ -38,16 +42,15 @@
     "build": "echo \"No build required for this project.\"",
     "verify": "npm run check && npm run test",
     "report": "mkdirp public && copyfiles logo.png public/ && copyfiles \"reports/**/*\" public && mustache package.json dev-scripts/resources/pages/index.hbs > public/index.html",
-    "start": "node ."
+    "start": "node src/main"
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm run pretty -s"
+      "pre-commit": "npm run pre-commit -s && npm run pretty -s"
     }
   },
   "logo": "logo.png",
   "devDependencies": {
-    "@actions/core": "^1.2.6",
     "copyfiles": "^2.4.0",
     "eslint": "^7.13.0",
     "eslint-config-mearns": "git+https://github.com/mearns/eslint-config-mearns.git#v0.3.0",
@@ -63,6 +66,7 @@
     "pretty-quick": "^2.0.2"
   },
   "dependencies": {
+    "@actions/core": "^1.2.6",
     "@actions/exec": "^1.0.4",
     "update-json-file": "^1.1.1"
   }

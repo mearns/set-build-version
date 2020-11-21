@@ -1,45 +1,22 @@
-const run = require("./index");
-const { exec } = require("child_process");
+#!/usr/bin/env node
+
+const updatePackageJson = require("./commands/update-package-json");
+const preCommit = require("./commands/pre-commit");
 
 async function main() {
-    const outputs = {};
-    const tkCore = {
-        info: console.log,
-        setOutput: (name, value) => {
-            outputs[name] = value;
-        }
-    };
-    const tkExec = {
-        exec: (command, args, opts) => {
-            return new Promise((resolve, reject) => {
-                exec([command, ...args].join(" "), (error, stdout, stderr) => {
-                    if (error) {
-                        reject(error);
-                    } else {
-                        if (opts.listeners) {
-                            if (opts.listeners.stdout) {
-                                opts.listeners.stdout(
-                                    Buffer.from(stdout, "utf8")
-                                );
-                            }
-                            if (opts.listeners.stderr) {
-                                opts.listeners.stderr(
-                                    Buffer.from(stderr, "utf8")
-                                );
-                            }
-                        }
-                        resolve();
-                    }
-                });
-            });
-        }
-    };
-    try {
-        await run({ core: tkCore, exec: tkExec });
-        console.log(outputs);
-    } catch (error) {
-        console.error(error);
-        process.exitCode = 1;
+    const [, , command] = process.argv;
+    switch (command) {
+        case "update-package-json":
+            await updatePackageJson();
+            return;
+
+        case "pre-commit":
+            await preCommit();
+            return;
+
+        default:
+            console.error(`Unknown command: ${command}`);
+            process.exitCode = 1;
     }
 }
 

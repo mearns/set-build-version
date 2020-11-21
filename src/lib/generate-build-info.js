@@ -59,5 +59,5 @@ async function addIsGitDirty(buildInfo, { env, exec }) {
     buildInfo.dirty =
         Buffer.concat(output)
             .toString("utf-8")
-            .trim().length === 0;
+            .trim().length !== 0;
 }

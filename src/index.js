@@ -29,7 +29,7 @@ async function overwritePackageData(version, buildInfo) {
     await updateJsonFile(
         "package.json",
         data => {
-            data.version = version;
+            data.version = version.toString();
             data.buildInfo = buildInfo;
             return data;
         },
