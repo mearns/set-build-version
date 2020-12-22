@@ -9,7 +9,7 @@ describe("The determineVersionString function", () => {
                 core: mockCore(),
                 exec: mockExec(),
                 env: {
-                    CI: "true",
+                    GITHUB_ACTIONS: "true",
                     GITHUB_REF: "refs/heads/master",
                     GITHUB_RUN_NUMBER: "17"
                 }
@@ -25,7 +25,7 @@ describe("The determineVersionString function", () => {
                 core: mockCore(),
                 exec: mockExec(),
                 env: {
-                    CI: "true",
+                    GITHUB_ACTIONS: "true",
                     GITHUB_REF: "refs/heads/feature/my-branch",
                     GITHUB_RUN_NUMBER: "32"
                 }
@@ -50,7 +50,7 @@ describe("The determineVersionString function", () => {
                 core: mockCore(),
                 exec: mockExec(),
                 env: {
-                    CI: "true",
+                    GITHUB_ACTIONS: "true",
                     GITHUB_REF: `refs/tags/${tagPrefix}4.8.3`
                 }
             }
@@ -77,5 +77,7 @@ function mockCore() {
 }
 
 function mockExec() {
-    return {};
+    return {
+        exec: () => {}
+    };
 }

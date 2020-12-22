@@ -1,27 +1,29 @@
 const os = require("os");
-const getRef = require("./get-ref");
+const getRepoInfo = require("./repo-info");
 
-module.exports = async function generateBuildInfo({ env, exec }) {
+/**
+ * Return an object containing information about the context of this build, such as
+ * the current branch (or other git ref), the git commit ID, whether or not the repo
+ * is currently dirty with respect to git, etc. For github actions this will be pulled
+ * from the CI environment variables. Otherwise, we will call out to the "git" command
+ * to get it.
+ */
+module.exports = async function getAdditionalRepoInfo({ env, exec }) {
+    const repoInfo = getRepoInfo({ env, exec });
     const buildInfo = {
-        date: new Date().toISOString()
+        date: new Date().toISOString(),
+        ...(await repoInfo.getAdditionInfo())
     };
-    await addGitRef(buildInfo, { env, exec });
-    await addGitCommit(buildInfo, { env, exec });
-    await addIsGitDirty(buildInfo, { env, exec });
-
-    if (env.CI) {
-        buildInfo.runId = env.GITHUB_RUN_ID;
-        buildInfo.runNumber = env.GITHUB_RUN_NUMBER;
-    } else {
-        buildInfo.user = os.userInfo().username;
-        buildInfo.host = os.hostname();
-    }
-
+    await Promise.all([
+        addGitRef(buildInfo, repoInfo),
+        addGitCommit(buildInfo, { env, exec }),
+        addIsDirty(buildInfo, { env, exec })
+    ]);
     return buildInfo;
 };
 
-async function addGitRef(buildInfo, { env, exec }) {
-    const [refType, refName] = await getRef({ env, exec });
+async function addGitRef(buildInfo, repoInfo) {
+    const [refType, refName] = await repoInfo.getRef();
     if (refType === "heads") {
         buildInfo.branch = refName;
     } else if (refType === "tags") {
@@ -29,35 +31,10 @@ async function addGitRef(buildInfo, { env, exec }) {
     }
 }
 
-async function addGitCommit(buildInfo, { env, exec }) {
-    if (env.CI) {
-        buildInfo.commit = env.GITHUB_SHA;
-    }
-    const output = [];
-    await exec.exec("git", ["rev-parse", "HEAD"], {
-        listeners: {
-            stdout: chunk => {
-                output.push(chunk);
-            }
-        }
-    });
-    buildInfo.commit = Buffer.concat(output).toString("utf-8");
+async function addGitCommit(buildInfo, repoInfo) {
+    buildInfo.commit = await repoInfo.getCommitId();
 }
 
-async function addIsGitDirty(buildInfo, { env, exec }) {
-    if (env.CI) {
-        return;
-    }
-    const output = [];
-    await exec.exec("git", ["diff", "--stat"], {
-        listeners: {
-            stdout: chunk => {
-                output.push(chunk);
-            }
-        }
-    });
-    buildInfo.dirty =
-        Buffer.concat(output)
-            .toString("utf-8")
-            .trim().length !== 0;
+async function addIsDirty(buildInfo, repoInfo) {
+    buildInfo.dirty = await repoInfo.isDirty();
 }

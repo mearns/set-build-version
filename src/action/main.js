@@ -1,3 +1,6 @@
+/**
+ * This is the entry point for the github-action.
+ */
 const core = require("@actions/core");
 const exec = require("@actions/exec");
 const run = require("./index");

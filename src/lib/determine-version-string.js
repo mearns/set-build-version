@@ -1,4 +1,4 @@
-const getRef = require("./get-ref");
+const getRepoInfo = require("./repo-info");
 
 const semverRegex = /([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([^+]+))?(?:\+(.*))?$/;
 const versionTagRegex = new RegExp(
@@ -7,10 +7,32 @@ const versionTagRegex = new RegExp(
     "i"
 );
 
-async function determineVersion(packageData, { core, exec, env }) {
+/**
+ * Use our versioning scheme rules to determine the appropriate version string to use for this build.
+ * In summary:
+ *  - If it's the "release" branch, then we'll use the version string exactly as it is in package.json, but it
+ *    must be either a release or a release candidate.
+ *  - If it's the "master" branch, then we'll call it a _beta_ build and replace the first "dev" element
+ *    of the pre-release version component with a unique beta ID.
+ *  - Any other branch will work the same as "master", but with an _alpha_ build instead of _beta_,
+ *    and a pre-release element specific to the branch.
+ */
+async function determineVersion(
+    packageData,
+    {
+        core,
+        exec,
+        env,
+        releaseBranchPatterns = [/release$/],
+        rcBranchPatterns = [/release$/],
+        betaBranchPatterns = [/^master$/],
+        alphaBranchPatterns = [/.*/]
+    }
+) {
+    const repoInfo = getRepoInfo({ env, exec });
     const baseVersion = getBaseVersion(packageData);
 
-    const [refType, refName] = await getRef({ env, exec });
+    const [refType, refName] = await repoInfo.getRef();
 
     if (refType === "tags") {
         const tagVersion = getVersionFromTag(refName);

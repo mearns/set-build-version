@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+/*
+ * This is the CLI entry point for this tool.
+ */
 
 const updatePackageJson = require("./commands/update-package-json");
 const preCommit = require("./commands/pre-commit");

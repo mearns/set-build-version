@@ -1,3 +1,7 @@
+/**
+ * This is the top-level of the core of the tool. The CLI entry point and the github-action entry point both
+ * delegate to this.
+ */
 const determineVersionString = require("./lib/determine-version-string");
 const generateBuildInfo = require("./lib/generate-build-info");
 const fs = require("fs").promises;
